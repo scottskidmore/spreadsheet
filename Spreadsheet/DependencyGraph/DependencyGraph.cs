@@ -134,8 +134,6 @@ public class DependencyGraph
     /// 
     ///   t depends on s
     ///   
-    ///   A 2D array is used to hold two arrays that store the dependents and the dependees.
-    ///   Index 0 holds the array for dependees and index 1 holds dependents
     /// </summary>
     /// <param name="s"> s must be evaluated first. T depends on S</param>
     /// <param name="t"> t cannot be evaluated until s is</param>
