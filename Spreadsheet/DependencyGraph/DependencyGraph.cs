@@ -102,7 +102,7 @@ public class DependencyGraph
     /// </summary>
     public IEnumerable<string> GetDependents(string s)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         if (graph.TryGetValue(s, out arrays))
         {
        
@@ -117,7 +117,7 @@ public class DependencyGraph
     /// </summary>
     public IEnumerable<string> GetDependees(string s)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         if (graph.TryGetValue(s, out arrays))
         {
             
@@ -139,7 +139,7 @@ public class DependencyGraph
     /// <param name="t"> t cannot be evaluated until s is</param>
     public void AddDependency(string s, string t)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         ///A 2D array is used to hold two arrays that store the dependents and the dependees.
         ///Index 0 holds the array for dependees and index 1 holds dependents
         if(graph.TryGetValue(s, out arrays))
@@ -152,8 +152,10 @@ public class DependencyGraph
         else
         {
             graph.Add(s, new List<List<string>>{new List<string>(), new List<string>()} );
-            graph.TryGetValue(s, out arrays);
-            arrays[1].Add(t);
+            if (graph.TryGetValue(s, out arrays))
+            {
+                arrays[1].Add(t);
+            }
         }
         if (graph.TryGetValue(t, out arrays))
         {
@@ -166,8 +168,10 @@ public class DependencyGraph
         else
         {
             graph.Add(t, new List<List<string>> { new List<string>(), new List<string>() });
-            graph.TryGetValue(t, out arrays);
-            arrays[0].Add(s);
+            if (graph.TryGetValue(t, out arrays))
+            {
+                arrays[0].Add(s);
+            }
         }
         pairs++;
 
@@ -181,7 +185,7 @@ public class DependencyGraph
     /// <param name="t"></param>
     public void RemoveDependency(string s, string t)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         if (graph.TryGetValue(s, out arrays))
         {
             arrays[1].Remove(t);
@@ -203,7 +207,7 @@ public class DependencyGraph
     /// </summary>
     public void ReplaceDependents(string s, IEnumerable<string> newDependents)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         if (graph.TryGetValue(s, out arrays))
         {
             pairs = pairs - arrays[1].Count;
@@ -222,7 +226,7 @@ public class DependencyGraph
     /// </summary>
     public void ReplaceDependees(string s, IEnumerable<string> newDependees)
     {
-        List<List<string>> arrays;
+        List<List<string>> ?arrays;
         if (graph.TryGetValue(s, out arrays))
         {
             pairs = pairs - arrays[0].Count;
