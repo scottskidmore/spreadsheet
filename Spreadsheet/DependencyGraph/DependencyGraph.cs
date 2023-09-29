@@ -33,7 +33,7 @@ namespace SpreadsheetUtilities;
 public class DependencyGraph
 {
     private int pairs;
-    private Dictionary<string, List<List<string>>> graph;
+    public Dictionary<string, List<List<string>>> graph;
     
     /// <summary>
     /// Creates an empty DependencyGraph.

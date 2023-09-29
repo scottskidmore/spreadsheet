@@ -31,11 +31,8 @@ namespace SpreadsheetUtilities;
 /// </summary>
 public class Formula
 {
-    private List<string> formula;
-    public List<string> get()
-    {
-        return formula;
-    }
+    public List<string> formula { get; }
+    
     /// <summary>
     /// Creates a Formula from a string that consists of an infix expression written as
     /// described in the class comment.  If the expression is syntactically invalid,
@@ -546,7 +543,7 @@ public class Formula
             return false;
         }
         Formula f = (Formula)obj;
-        string[] arr =f.get().ToArray();
+        string[] arr =f.formula.ToArray();
         string[] arr1 = formula.ToArray();
         
         if (arr.Length != arr1.Length)
