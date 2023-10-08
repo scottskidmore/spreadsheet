@@ -72,7 +72,7 @@ namespace SS
     public class Spreadsheet : AbstractSpreadsheet
     {
 
-        public Dictionary<string, Cell> cells { get; }
+        public Dictionary<string, Cell> Cells { get; }
         private DependencyGraph dg;
         private Func<string, string> normalizer;
         private Func<string, bool> validator;
@@ -84,7 +84,7 @@ namespace SS
         [JsonConstructor]
         public Spreadsheet(Dictionary<string, Cell> cells, string Version) : base(Version)
         {
-            this.cells = cells;
+            this.Cells = cells;
             dg = new DependencyGraph();
             normalizer = s => s;
             validator = s => true;
@@ -96,7 +96,7 @@ namespace SS
         /// </summary>
         public Spreadsheet() : base("default")
         {
-            cells = new Dictionary<string, Cell>();
+            Cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
             normalizer = s => s;
             validator = s => true;
@@ -108,7 +108,7 @@ namespace SS
         /// </summary>
         public Spreadsheet(Func<string, bool> isValid, Func<string, string> normalize, string version) : base(version)
         {
-            cells = new Dictionary<string, Cell>();
+            Cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
             normalizer = normalize;
             validator = isValid;
@@ -121,7 +121,7 @@ namespace SS
         /// </summary>
         public Spreadsheet(string file, Func<string, bool> isValid, Func<string, string> normalize, string version) : base(version)
         {
-            cells = new Dictionary<string, Cell>();
+            Cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
             string f;
             Spreadsheet? s;
@@ -147,10 +147,14 @@ namespace SS
             {
                 throw new SpreadsheetReadWriteException("File returned null");
             }
-            if (s.cells is null)
+            if (s.Cells is null)
             {
                 normalizer = normalize;
                 validator = isValid;
+            }
+            if (s.Version !=version)
+            {
+                throw new SpreadsheetReadWriteException("Version miss match");
             }
             else
             {
@@ -158,7 +162,7 @@ namespace SS
                 normalizer = normalize;
                 validator = isValid;
 
-                List<KeyValuePair<string, Cell>> list = s.cells.ToList();
+                List<KeyValuePair<string, Cell>> list = s.Cells.ToList();
                 foreach (KeyValuePair<string, Cell> v in list)
                 {
                     SetContentsOfCell(v.Key, v.Value.StringForm);
@@ -186,9 +190,9 @@ namespace SS
                 throw new InvalidNameException();
             }
             name = normalizer(name);
-            if (cells.ContainsKey(name))
+            if (Cells.ContainsKey(name))
             {
-                return cells[name].contents;
+                return Cells[name].contents;
             }
             else
             {
@@ -200,7 +204,7 @@ namespace SS
         /// </summary>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            return cells.Keys.ToArray();
+            return Cells.Keys.ToArray();
         }
         /// <summary>
         /// If name is invalid, throws an InvalidNameException.
@@ -215,7 +219,7 @@ namespace SS
         protected override IList<string> SetCellContents(string name, double number)
         {
 
-            if (cells.ContainsKey(name))
+            if (Cells.ContainsKey(name))
             {
                 if (GetCellContents(name) is Formula)
                 {
@@ -234,14 +238,14 @@ namespace SS
 
 
                 }
-                cells[name].contents = number;
-                cells[name].StringForm = number.ToString();
+                Cells[name].contents = number;
+                Cells[name].StringForm = number.ToString();
 
             }
             else
             {
                 Cell cell = new Cell(number);
-                cells.Add(name, cell);
+                Cells.Add(name, cell);
             }
             List<string> list = DependencyList(name);
             list.Add(name);
@@ -260,7 +264,7 @@ namespace SS
         protected override IList<string> SetCellContents(string name, string text)
         {
 
-            if (cells.ContainsKey(name))
+            if (Cells.ContainsKey(name))
             {
                 if (GetCellContents(name) is Formula)
                 {
@@ -281,12 +285,12 @@ namespace SS
                 }
                 if (text == "")
                 {
-                    cells.Remove(name);
+                    Cells.Remove(name);
 
                     return GetDirectDependents(name).ToList();
                 }
-                cells[name].contents = text;
-                cells[name].StringForm = text;
+                Cells[name].contents = text;
+                Cells[name].StringForm = text;
                 GetCellsToRecalculate(name);
             }
 
@@ -298,7 +302,7 @@ namespace SS
                     return GetDirectDependents(name).ToList();
                 }
                 Cell cell = new Cell((object)text);
-                cells.Add(name, cell);
+                Cells.Add(name, cell);
             }
             List<string> list = DependencyList(name);
             list.Add(name);
@@ -320,7 +324,7 @@ namespace SS
         protected override IList<string> SetCellContents(string name, Formula formula)
         {
 
-            if (cells.ContainsKey(name))
+            if (Cells.ContainsKey(name))
             {
                 if (GetCellContents(name) is Formula)
                 {
@@ -352,8 +356,8 @@ namespace SS
                     dg.AddDependency(var, name);
                 }
 
-                cells[name].contents = formula;
-                cells[name].StringForm = formula.ToString();
+                Cells[name].contents = formula;
+                Cells[name].StringForm = "="+formula.ToString();
                 GetCellsToRecalculate(name);
             }
             else
@@ -381,7 +385,7 @@ namespace SS
                     dg.AddDependency(var, name);
                 }
 
-                cells.Add(name, cell);
+                Cells.Add(name, cell);
             }
             List<string> dependents = DependencyList(name);
 
@@ -407,7 +411,7 @@ namespace SS
         {
 
 
-            if (cells.TryGetValue(name, out Cell? cell))
+            if (Cells.TryGetValue(name, out Cell? cell))
             {
                 return dg.GetDependents(name);
             }
@@ -431,7 +435,7 @@ namespace SS
         {
 
             List<string> dependents = new List<string>();
-            if (cells.TryGetValue(name, out Cell? cell))
+            if (Cells.TryGetValue(name, out Cell? cell))
             {
 
 
@@ -513,14 +517,14 @@ namespace SS
                 throw new InvalidNameException();
             }
             name = normalizer(name);
-            if (cells.ContainsKey(name))
+            if (Cells.ContainsKey(name))
             {
 
-                if (cells[name].contents is Formula)
+                if (Cells[name].contents is Formula)
                 {
-                    return ((Formula)cells[name].contents).Evaluate(LookUp);
+                    return ((Formula)Cells[name].contents).Evaluate(LookUp);
                 }
-                return cells[name].contents;
+                return Cells[name].contents;
             }
             else
             {

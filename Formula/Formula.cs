@@ -240,41 +240,44 @@ public class Formula
                     break;
               
                 case "Reference":
+                    double look;
+                    try
+
+                    {
+
+                        look = lookup(s);
+
+                    }
+
+                    catch (ArgumentException)
+                    {
+                        return new FormulaError("No reference found.");
+                    }
                     if (topStack(op) is "/" or "*")
                     {
                         string operate = op.Pop();
                        
                         double value = values.Pop();
-                        try
-
-                        {
-
-                            lookup(s);
-
-                        }
-
-                        catch (ArgumentException)
-                        {
-                            return new FormulaError("No reference found.");
-                        }
 
                         
-                            if (lookup(s) == 0.0)
+
+                        
+                            if (look == 0.0)
                         {
                             return new FormulaError("Invalid 0 division.");
                         }
                         if (operate == "/")
                         {
-                            values.Push(value / lookup(s));
+                            values.Push(value / look);
                         }
                         if (operate == "*")
                         {
-                            values.Push(value * lookup(s));
+                            values.Push(value * look);
                         }
                     }
                     else
                     {
-                        values.Push(lookup(s));
+                        values.Push(look);
                     }
                     break;
                 case "Add":
